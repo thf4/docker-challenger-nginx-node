@@ -4,6 +4,11 @@ services:
     image: mysql:5.7
     command: --innodb-use-native-aio=0
     container_name: db
+    healthcheck:
+        test: "/usr/bin/mysql --user=root --password=root --execute \"SHOW DATABASES;\""
+        interval: 2s
+        timeout: 20s
+        retries: 10
     restart: always
     tty: true
     volumes:
@@ -21,7 +26,8 @@ services:
       - /usr/src/app/node_modules
     restart: always
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks: 
       - node_network
   nginx:
